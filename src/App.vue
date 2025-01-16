@@ -3,13 +3,27 @@ import TheHeader from "./components/Header.vue";
 import TheFooter from "./components/Footer.vue";
 import Cart from "./components/Cart/Cart.vue";
 import Shop from "./components/Shop/Shop.vue";
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import data from "./data/products";
 
 // récupération des données depuis le fichier products dans data
-const products = reactive(data);
+const products = reactive([]);
 const cart = reactive([]);
 
+async function getProduct() {
+  try {
+    const reponse = await fetch("http://localhost:5000/");
+
+    let data = await reponse.json();
+    products.splice(0, products.length, ...data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+onMounted(() => {
+  getProduct();
+});
 // creer une fonction qui va ajouter des produits au panier
 function addProductToCart(productId) {
   const newProduct = products.find((product) => product.id === productId);
@@ -17,8 +31,7 @@ function addProductToCart(productId) {
 }
 
 function deleteProductFromCart(productId) {
-  const newProduct = products.find((product) => product.id === productId);
-  cart.push(newProduct);
+  console.log(productId);
 }
 </script>
 
@@ -31,7 +44,11 @@ function deleteProductFromCart(productId) {
       class="shop"
       @addProductToCart="addProductToCart"
     />
-    <Cart :cartList="cart" class="cart" />
+    <Cart
+      :cartList="cart"
+      class="cart"
+      @deleteProductFromCart="deleteProductFromCart"
+    />
     <TheFooter class="footer" />
   </div>
 </template>
