@@ -25,13 +25,23 @@ onMounted(() => {
   getProduct();
 });
 // creer une fonction qui va ajouter des produits au panier
-function addProductToCart(productId) {
+async function addProductToCart(productId) {
   const newProduct = products.find((product) => product.id === productId);
   cart.push(newProduct);
-}
+  try {
+    const response = await fetch("http://localhost:5000/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: productId,
+      }),
+    });
 
-function deleteProductFromCart(productId) {
-  console.log(productId);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout au panier :", error);
+  }
 }
 </script>
 
